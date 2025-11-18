@@ -65,6 +65,13 @@ let detailBarang = null;
   }
 })();
 
+// ========================================
+// TOMBOL KEMBALI
+// ========================================
+
+document.getElementById("backBtn").addEventListener("click", () => {
+  window.location.href = "index.html";
+});
 
 // ========================================
 // KIRIM PO SETELAH KONFIRMASI
@@ -88,3 +95,4 @@ konfirmasiBtn.addEventListener("click", async () => {
   localStorage.removeItem("poFormData");
   window.location.href = "index.html";
 });
+
