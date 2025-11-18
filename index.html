@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Form PO</title>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-4">
+
+  <!-- PROTEKSI HALAMAN -->
+  <script>
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const loginTime = localStorage.getItem("loginTime");
+
+    if (!isLoggedIn || !loginTime) {
+      window.location.href = "login.html";
+    } else {
+      const now = Date.now();
+      const maxSession = 12 * 60 * 60 * 1000; // 12 jam
+
+      if (now - loginTime > maxSession) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("loginTime");
+        window.location.href = "login.html";
+      }
+    }
+  </script>
+
+
+  <div class="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-md">
+    <h2 class="text-xl font-semibold mb-4 text-center">Form Purchase Order</h2>
+
+    <!-- Tanggal -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Tanggal PO</label>
+      <input type="date" id="tanggal" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200" />
+    </div>
+
+    <!-- Dropdown Outlet -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Outlet</label>
+      <select id="outlet" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200">
+        <option value="">Pilih Outlet</option>
+        <option>Pizza Nyantuy Sungai Poso</option>
+        <option>Pizza Nyantuy Gowa</option>
+        <option>Pizza Nyantuy Sudiang</option>
+        <option>Pizza Nyantuy Barombong</option>
+        <option>Pizza Nyantuy Limbung</option>
+      </select>
+    </div>
+
+    <!-- Searchable Nama Barang -->
+    <div class="mb-4 relative">
+      <label class="block text-sm font-medium mb-1">Nama Barang</label>
+
+      <input 
+        type="text" 
+        id="barangSearch" 
+        placeholder="Cari nama barang..."
+        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200"
+        autocomplete="off"
+      />
+
+      <div 
+        id="barangList" 
+        class="absolute w-full bg-white border rounded-lg mt-1 max-h-40 overflow-y-auto shadow-lg hidden z-10"
+      ></div>
+    </div>
+
+    <!-- Jumlah -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Jumlah</label>
+      <input type="number" id="jumlah" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200" placeholder="Masukkan jumlah" />
+    </div>
+
+    <!-- Tombol Submit -->
+    <button id="kirimBtn" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+      Kirim PO
+    </button>
+
+    <p id="success" class="text-green-600 text-sm text-center mt-3 hidden">Data PO berhasil dikirim!</p>
+    <p id="error" class="text-red-600 text-sm text-center mt-3 hidden">Harap isi semua field!</p>
+
+    <p class="text-sm text-center mt-3 text-gray-600">
+    Tidak menemukan barang di list?
+    <a href="formkosong.html" class="text-blue-600 font-semibold hover:underline">
+      form kosong
+    </a>
+</p>
+
+  </div>
+
+  <script src="js/index.js"></script>
+
+</body>
+</html>
