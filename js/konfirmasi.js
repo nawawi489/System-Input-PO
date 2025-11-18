@@ -4,92 +4,87 @@ const formData = JSON.parse(saved);
 
 // Tampilkan data dari form ke HTML
 document.getElementById("formData").innerHTML = `
-  <p><strong>Tanggal PO :</strong> ${formData.tanggal}</p>
-  <p><strong>Outlet     :</strong> ${formData.outlet}</p>
-  <p><strong>Barang     :</strong> ${formData.barang}</p>
-  <p><strong>Jumlah     :</strong> ${formData.jumlah}</p>
+  <p><strong>Tanggal PO:</strong> ${formData.tanggal}</p>
+  <p><strong>Outlet:</strong> ${formData.outlet}</p>
+  <p><strong>Barang:</strong> ${formData.barang}</p>
+  <p><strong>Jumlah:</strong> ${formData.jumlah}</p>
+`;
+
+// Tombol konfirmasi → disable dulu
+const konfirmasiBtn = document.getElementById("konfirmasiBtn");
+konfirmasiBtn.disabled = true;
+konfirmasiBtn.classList.add("opacity-50", "cursor-not-allowed");
+
+// Tambahkan indikator loading (opsional)
+document.getElementById("sheetData").innerHTML = `
+  <p class="text-gray-500 italic">Memuat detail barang...</p>
 `;
 
 // ========================================
-// AMBIL DETAIL BARANG DARI N8N SAAT HALAMAN DIBUKA
+// AMBIL DETAIL BARANG DARI SHEET VIA N8N
 // ========================================
-
 async function getBarangDetail(namaBarang) {
-  const url =
-    "https://n8n.srv1123014.hstgr.cloud/webhook/get-barang-detail?nama=" +
-    encodeURIComponent(namaBarang);
-
+  const url = "https://n8n.srv1123014.hstgr.cloud/webhook/get-barang-detail?nama=" + encodeURIComponent(namaBarang);
   const res = await fetch(url);
   const data = await res.json();
 
   return {
-    satuan: data["Satuan"],
     harga: data["Harga"],
+    satuan: data["Satuan"],
     supplier: data["Nama Supplier"],
     wa: data["Nomor WhatsApp"]
   };
 }
 
-// Load detail dan tampilkan otomatis
-let detailBarang = {}; // simpan untuk dikirim ke backend
+// ========================================
+// LOAD DATA DETAIL & AKTIFKAN TOMBOL
+// ========================================
+
+let detailBarang = null;
 
 (async () => {
-  detailBarang = await getBarangDetail(formData.barang);
+  try {
+    detailBarang = await getBarangDetail(formData.barang);
 
-  document.getElementById("sheetData").innerHTML = `
-    <p><strong>Satuan       :</strong> ${detailBarang.satuan}</p>
-    <p><strong>Harga Satuan :</strong> ${detailBarang.harga}</p>
-    <p><strong>Supplier     :</strong> ${detailBarang.supplier}</p>
-    <p><strong>No. WA       :</strong> ${detailBarang.wa}</p>
-  `;
+    // tampilkan ke HTML
+    document.getElementById("sheetData").innerHTML = `
+      <p><strong>Harga:</strong> ${detailBarang.harga}</p>
+      <p><strong>Satuan:</strong> ${detailBarang.satuan}</p>
+      <p><strong>Supplier:</strong> ${detailBarang.supplier}</p>
+      <p><strong>No. WA:</strong> ${detailBarang.wa}</p>
+    `;
+
+    // Aktifkan tombol setelah semua selesai
+    konfirmasiBtn.disabled = false;
+    konfirmasiBtn.classList.remove("opacity-50", "cursor-not-allowed");
+
+  } catch (err) {
+    document.getElementById("sheetData").innerHTML = `
+      <p class="text-red-600">Gagal memuat detail barang!</p>
+    `;
+  }
 })();
 
-// ========================================
-// Batalkan PO
-// ========================================
-
-document.getElementById("backBtn").addEventListener("click", () => {
-  window.location.href = "index.html";
-});
 
 // ========================================
 // KIRIM PO SETELAH KONFIRMASI
 // ========================================
 
-document.getElementById("konfirmasiBtn").addEventListener("click", async () => {
-  
-  // Gabungkan data form + detail barang
+konfirmasiBtn.addEventListener("click", async () => {
+  if (!detailBarang) return; // keamanan tambahan
+
   const finalPayload = {
-    tanggal: formData.tanggal,
-    outlet: formData.outlet,
-    barang: formData.barang,
-    jumlah: formData.jumlah,
-    harga: detailBarang.harga,
-    satuan: detailBarang.satuan,
-    supplier: detailBarang.supplier,
-    wa: detailBarang.wa
+    ...formData,
+    ...detailBarang
   };
 
-  console.log("Mengirim payload ke n8n:", finalPayload);
+  await fetch("https://n8n.srv1123014.hstgr.cloud/webhook/input-po", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(finalPayload)
+  });
 
-  try {
-    const res = await fetch("https://n8n.srv1123014.hstgr.cloud/webhook/input-po", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(finalPayload),
-    });
-
-    if (!res.ok) {
-      throw new Error("N8N Response Error");
-    }
-
-    alert("PO berhasil dikirim ke n8n!");
-    localStorage.removeItem("poFormData"); 
-    window.location.href = "index.html";
-
-  } catch (err) {
-    alert("Gagal mengirim PO. Periksa koneksi atau workflow n8n.");
-    console.error(err);
-  }
+  alert("PO berhasil dikirim!");
+  localStorage.removeItem("poFormData");
+  window.location.href = "index.html";
 });
-
