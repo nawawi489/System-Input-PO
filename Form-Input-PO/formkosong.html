@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Form Plan PO</title>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-4">
+
+  <!-- PROTEKSI LOGIN -->
+  <script>
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const loginTime = localStorage.getItem("loginTime");
+
+    if (!isLoggedIn || !loginTime) {
+        window.location.href = "login.html";
+    } else {
+        const now = Date.now();
+        const maxSession = 12 * 60 * 60 * 1000; // 12 jam
+
+        if (now - loginTime > maxSession) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("loginTime");
+        window.location.href = "login.html";
+        }
+    }
+    </script>
+
+
+  <div class="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-md">
+    <h2 class="text-xl font-semibold mb-4 text-center">Form PO Kosong (Manual)</h2>
+
+    <!-- Tanggal PO -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Tanggal PO</label>
+      <input type="date" id="tanggal" class="w-full px-3 py-2 border rounded-lg" />
+    </div>
+
+    <!-- Outlet -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Outlet</label>
+      <select id="outlet" class="w-full px-3 py-2 border rounded-lg">
+        <option value="">Pilih Outlet</option>
+        <option>Pizza Nyantuy Sungai Poso</option>
+        <option>Pizza Nyantuy Gowa</option>
+        <option>Pizza Nyantuy Sudiang</option>
+        <option>Pizza Nyantuy Barombong</option>
+        <option>Pizza Nyantuy Limbung</option>
+      </select>
+    </div>
+
+    <!-- Nama Barang -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Nama Barang</label>
+      <input type="text" id="barang" class="w-full px-3 py-2 border rounded-lg" placeholder="Masukkan nama barang" />
+    </div>
+
+    <!-- Satuan -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Satuan</label>
+      <input type="text" id="satuan" class="w-full px-3 py-2 border rounded-lg" placeholder="Contoh: Karton, Pack" />
+    </div>
+
+    <!-- Jumlah -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Jumlah</label>
+      <input type="number" id="jumlah" class="w-full px-3 py-2 border rounded-lg" placeholder="Masukkan jumlah" />
+    </div>
+
+    <!-- Harga Satuan -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Harga Satuan</label>
+      <input type="number" id="harga" class="w-full px-3 py-2 border rounded-lg" placeholder="Masukkan harga satuan" />
+    </div>
+
+    <!-- Supplier -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Supplier</label>
+      <input type="text" id="supplier" class="w-full px-3 py-2 border rounded-lg" placeholder="Masukkan nama supplier" />
+    </div>
+
+    <!-- Tombol Submit -->
+    <button id="kirimBtn"
+      class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+      Lanjutkan ke Konfirmasi
+    </button>
+
+    <p class="text-sm text-center mt-3 text-gray-600">
+        Kembali ke
+    <a href="index.html" class="text-blue-600 font-semibold hover:underline">
+        form otomatis
+    </a>
+    </p>
+
+    <p id="error" class="text-red-600 text-sm text-center mt-3 hidden">Harap isi semua field!</p>
+  </div>
+
+  <script src="js/formkosong.js"></script>
+
+</body>
+</html>

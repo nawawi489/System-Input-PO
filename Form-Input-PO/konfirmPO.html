@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Konfirmasi PO</title>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+
+  <!-- PROTEKSI HALAMAN -->
+  <script>
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const loginTime = localStorage.getItem("loginTime");
+
+    if (!isLoggedIn || !loginTime) {
+      window.location.href = "login.html";
+    } else {
+      const now = Date.now();
+      const maxSession = 12 * 60 * 60 * 1000; // 12 jam
+
+      if (now - loginTime > maxSession) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("loginTime");
+        window.location.href = "login.html";
+      }
+    }
+  </script>
+
+
+  <div class="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg">
+    <h2 class="text-xl font-semibold text-center mb-4">Konfirmasi Purchase Order</h2>
+
+    <div id="formData" class="space-y-2 mb-2"></div>
+    <div id="sheetData" class="space-y-2"></div>
+
+    <div class="flex gap-3 mt-6">
+        <button 
+            id="backBtn"
+            class="w-1/2 bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400 transition">
+            Kembali
+        </button>
+
+        <button 
+            id="konfirmasiBtn"
+            class="w-1/2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+            Konfirmasi & Kirim PO
+        </button>
+    </div>
+
+  </div>
+
+  <script src="js/konfirmasi.js"></script>
+  <script>
+    function logout() {
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("poFormData");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>
